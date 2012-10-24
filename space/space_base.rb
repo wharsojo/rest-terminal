@@ -1,37 +1,33 @@
 require 'json'
 require 'base64'
 require 'faraday'
+require 'shellwords'
 
 class SpaceBase
-	def initialize(vc=nil,path='/')
+	def initialize(vc=nil,path='/',silent=false)
+    p "class: #{self.class} : path: #{path}"  if silent
+    @resp    = nil
     @headers = (vc && def_headers==vc.headers) ? {} : def_headers
     @vars    = (vc && def_vars   ==vc.vars)    ? {} : def_vars
     @path    = path
     @parent  = vc 
   end
 
-  def headers(up=true)
-    @_tmp = {}
-    @_tmp.merge!(@parent.headers) if @parent && up
-    @_tmp.merge!(@headers)
-    @_tmp
+  def _headers(prm)
+    prm=='' ? show_vars(headers) : set_value(:headers,prm)
   end
 
-  def vars(up=true)
-    @_tmp = {}
-    @_tmp.merge!(@parent.vars) if @parent && up
-    @_tmp.merge!(@vars)
-    @_tmp
+  def _inspect(prm)
+    puts prm=='' ? @resp.inspect : @resp[prm.to_sym].inspect
+    "Inspecting..."
   end
 
-  def _info(prm)
-    vars.each do |v|
-      puts "#{v[0]} = #{v[1]}"
-    end
-    'Variables info'
+  def _vars(prm)
+    prm=='' ? show_vars(vars) : set_value(:vars,prm)
   end
 
   def _send(prm)
+    puts "send: #{@path}"
     conn = Faraday.new(:url => @vars[:url])
     @resp = conn.post do |req|
       req.body = @vars[:body] if @vars[:body]
@@ -41,13 +37,38 @@ class SpaceBase
     "#{self.class} Command Send"
   end
 
-  def _set(prm)
-    tmp = prm.split('=').collect{|x|x.strip}
-    @vars[tmp[0].to_sym] = tmp[1]
-    'OK'
+  def headers(up=true)
+    inheritances(:headers,up)
+  end
+
+  def vars(up=true)
+    inheritances(:vars,up)
   end
 
   private 
+  def inheritances(key,up)
+    @_tmp = {}
+    @_tmp.merge!(@parent.send(key)) if @parent && up
+    @_tmp.merge!(instance_variable_get("@#{key}"))
+    @_tmp
+  end
+
+  def set_value(key,prm)
+    item = instance_variable_get("@#{key}")
+    wrds = Shellwords::shellwords(prm)
+    wrds.each do |itm|
+      v1,v2 = itm.split('=',2).collect{|x|x.strip}
+      item[v1.to_sym] = v2
+    end
+    "#{wrds.length} items"
+  end
+
+  def show_vars(items)
+    items.each do |v|
+      puts "#{v[0]} = #{v[1]}"
+    end
+    "#{items.length} items"
+  end
 
   def def_headers
     {

@@ -1,67 +1,66 @@
-require 'io/console'
-
 class VConsole
   include Commands
   include Persistent
 
   def initialize
-    @keys = ''
+    @skey = ''
     @repl = ''
     @type = 'earth'
     @serv = 'localhost'
   end
 
   def run
+    is_cmd = true
+    @hist = @@history.length
     until @repl == 'exit'
-      @_status = ''
-      print "#{prompt} "
-      @repl = getr # @repl = gets.chomp
-      parse if @repl != 'exit'
-      puts "> #{@_status}".intense_magenta 
+      print "#{prompt} " if is_cmd
+      @repl,@skey = GetC.get(@repl) # @repl = gets.chomp
+      is_cmd = /\n|\r/ =~ @skey
+      if !(is_cmd)
+        navkey 
+      elsif @repl != 'exit'
+        parse  
+      end
     end
   end
 
   private
-
-  def c_up
-    "\e[A"
-  end
-
-  def c_down
-    "\e[B"
-  end
-
-  def c_right
-    "\e[C"
-  end
-
-  def c_left
-    "\e[D"
-  end
-
-  def c_bspc
-    "\x7F"
-  end
-
-  def a_beol
-    "\033[1D\033[K"
-  end
-
-  def a_clear
-    "\033[2J"
+  def navkey
+    print "#{GetC::C_Erase_line}#{prompt}"
+    if @skey == GetC::CUp
+      @hist -= 1 if @hist > 0
+      @repl = @@history[@hist].to_s
+      print @repl
+    elsif @skey == GetC::CDown
+      @hist += 1 if @hist < @@history.length
+      @repl = @@history[@hist].to_s
+      print @repl
+    end
   end
 
   def parse
+    print "\n"
     @repl.strip!
-    cmd   = @repl.split(/ +/)[0]
-    @_tmp = Commands.instance_methods
-    found = @_tmp.index("_#{cmd[0]}".to_sym)
-    found = @_tmp.index("_#{cmd}".to_sym) if !found
-    exec(cmd) if found
+    if @repl==''
+      @repl='exit'
+    else
+      # found = cmd[0]=="_"
+      @_status = ''
+      cmd = @repl.split(/ +/)[0].to_s
+      if Commands.instance_methods.index("_#{cmd}".to_sym) 
+        exec(cmd) 
+        puts "> #{@_status}".intense_magenta 
+      else
+        puts "Commands not found >>#{@repl}<<".red
+      end
+      @repl = ''
+    end
   end
 
   def exec(c)
     @@history << @repl
+    @@history = @@history.reverse.uniq.reverse
+    @hist = @@history.length
     @repl = @repl.gsub(/^#{c}/,'').strip
     self.send("_#{c}") #if self.respond_to?("_#{c}")
   end
@@ -69,55 +68,5 @@ class VConsole
   def prompt
     "#{@type}@#{@serv} >".yellow
   end
-
-  def getr
-    chr = ""
-    row = ""
-    @keys = ''
-    until  /\n|\r/ =~ chr || chr == "\x03"  || 
-      chr == c_up    || chr == c_down ||
-      chr == c_right || chr == c_left
-      if chr == c_bspc 
-        if row.length>0
-          row = row[0,row.length-1]
-          print a_beol
-        end
-      else
-        row = "#{row}#{chr}"
-        if /[a-zA-Z0-9_\-\/=*. ]/ =~ chr
-          if chr=='/'
-            print chr.red 
-          elsif row.strip.split(/ +/).length>1
-            print chr.intense_red
-          else
-            print chr.green
-          end
-        end
-      end
-
-      begin
-        system("stty raw -echo")
-        chr = STDIN.getc.chr
-
-        if(chr=="\e")
-          extra_thread = Thread.new{
-            chr = chr + STDIN.getc.chr
-            chr = chr + STDIN.getc.chr
-          }
-          # wait just long enough for special keys to get swallowed
-          extra_thread.join(0.00001)
-          # kill thread so not-so-long special keys don't wait on getc
-          extra_thread.kill
-          @keys = chr
-          # p chr
-        end
-      ensure
-        system("stty -raw echo")
-      end
-    end
-    print "\n" if @keys==''
-    row
-  end
-
 end
 

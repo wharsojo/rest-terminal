@@ -11,25 +11,66 @@ class VConsole
     end
 
     def _cd
-      @_tmp = "#{@repl}/" if @repl[-1]!='/'
-      @_tmp = "#{@@pwd}#{@_tmp}" if @_tmp[0] != '/'
-      if @@spaces[@_tmp]
-        @@pwd = @_tmp
-        @_status = 'OK'
+      space = grep[0]
+      if space
+        @@pwd=space
+        @_status = "#{space} - OK"
+      end
+    end
+
+    def _cp
+      a,b=@repl.split(/ +/,2).collect{|x|full_path(x)}
+      puts "copy from: #{a} to: #{b}".red
+      if /^#{a}/=~b
+        @_status = "can't copy self tree..."
+      else
+        cut = a.gsub(/\w\/$/,'').length
+        sps = grep(a)
+        pd1 = sps[-1].length
+        pd2 = pd1 + b.length-1
+        sps.each do |src|
+          kls = @@spaces[src].class
+          tgt ="#{b}#{src[cut,99]}"
+          old = tgt.gsub(/\w\/$/,'') 
+
+          msg = "src: #{src.ljust(pd1,' ')} tgt: #{tgt.ljust(pd2,' ')} old: #{old}"
+          puts (@@spaces[tgt] ? msg.intense_red : msg.intense_cyan)
+
+          sp1 = @@spaces[old]
+          sp2 = @@spaces[tgt] = kls.new(sp1,tgt)
+
+          v = sp1.instance_variable_get("@vars")
+          h = sp1.instance_variable_get("@headers")
+          sp2.instance_variable_set("@vars",v)
+          sp2.instance_variable_set("@headers",h)
+        end
+        c = 'copied'.intense_cyan
+        r = 'replaced!'.intense_red
+        @_status = "#{sps.length} spaces #{c}/#{r}"
       end
     end
 
     def _clear
-      # @@history = []
       print "\033[2J\033[1;1H"
     end
 
-    def _history
-      @@history.each { |itm| puts itm.intense_cyan }
+    def _inspect
+      @_status =  current_space._inspect(@repl)
     end
 
-    def _info
-      @_status =  @@spaces[@@pwd]._info(@repl)
+    def _history
+      @@history.each_with_index do |itm,idx| 
+        puts "#{idx.to_s.rjust(2,'0')} > #{itm.intense_cyan}"
+      end
+      @_status = "#{@@history.length} histories"
+    end
+
+    def _headers
+      @_status =  current_space._headers(@repl)
+    end
+
+    def _vars
+      @_status =  current_space._vars(@repl)
     end
 
     def _add(silent=false)
@@ -45,7 +86,7 @@ class VConsole
             kls = spaced(@_tmp) 
             kls = old.class if !kls
             puts @_tmp.space_color if !silent
-            @@spaces[@_tmp] = kls.new(old,@_tmp) 
+            @@spaces[@_tmp] = kls.new(old,@_tmp,silent) 
           end
         end
       end
@@ -53,7 +94,24 @@ class VConsole
       @_status = "#{@_ttl} space Created!"
     end
 
-    def _rm
+    def _help
+      cmd = Commands.instance_methods
+      cmd.sort.each_with_index do |itm,idx| 
+        puts "#{idx.to_s.rjust(2,'0')} > #{itm[1,99].intense_cyan}"
+      end
+      @_status = "#{cmd.length} commands"
+    end
+
+    def _ls
+      spaces = grep.each_with_index do |spc,idx|
+        colr = "#{spc.space_color}#{'(*)'.red if spc==@@pwd}"
+        colr = "#{idx.to_s.rjust(2,'0')} > #{colr}"
+        puts colr
+      end
+      @_status = "List Spaces: #{spaces.length}"
+    end
+
+    def _rm(silent=false)
       @_ttl = 0
       @repl.split(/ +/).each do |space|
         @_tmp = full_path(space)
@@ -64,11 +122,12 @@ class VConsole
           @@spaces.delete(itm)
         end
       end
+      write_spaces if !silent
       @_status = "#{@_ttl} space Removed!"
     end
 
     def _pwd
-      @_status = "\"#{@@pwd}\""
+      @_status = "\"#{@@pwd}\" - OK"
     end
 
     def _reload
@@ -87,29 +146,34 @@ class VConsole
     end
 
     def _send
-      @_status = @@spaces[@@pwd]._send(@repl)
+      if @repl==''
+        @_status = current_space._send(@repl)
+      else
+        spaces = grep.each do |spc|
+          @@spaces[spc]._send(spc)
+        end
+        @_status = "#{spaces.length} Command Send"
+      end
     end
 
     def _set
-      @_status = @@spaces[@@pwd]._set(@repl)
+      @_status = current_space._vars(@repl)
     end
 
-    def _ls
-      path = (@repl[0]=='/') ? @repl : "*#{@repl}"
-      spaces = grep(path)
-      spaces.each do |spc|
-        colr = spc.space_color
-        colr = "#{colr}#{'(*)'.red if spc==@@pwd}"
-        puts colr
-      end
-      @_status = "List Spaces: #{spaces.length}"
-    end
-
+    alias :_h :_history
+    alias :_info :_vars
     alias :_create :_add
     alias :_remove :_rm
     alias :_spaces :_ls
+    alias :_i :_inspect
+    alias :_c :_clear
+    alias :_l :_ls
 
     private 
+
+    def current_space
+      @@spaces[@@pwd]
+    end
 
     def spaced(prm)
       c = Space.constants
@@ -123,12 +187,26 @@ class VConsole
     end
 
     def full_path(spc)
+      x = "#{@@pwd} "
+      l = x.count('/')+1
+      dots = spc[/\.+/]
+      if dots && 
+        set = l-dots.length
+        set = 1 if set < 1
+        path_up = x.split(/\//)[0,set].join('/')
+        spc.gsub!(/\.+/,path_up)
+      end
+      # if spc=='.'
+      #   @@pwd
+      # else
       spc = "#{spc}/" if spc[-1]!='/'
       space_path(spc)
+      # end
     end
 
-    def grep(rgx,sort=:asc)
-      puts "#{@@spaces.keys.inspect} : #{rgx}"
+    def grep(rgx=nil,sort=:asc)
+      rgx = (@repl[0]=='/') ? @repl : "*#{@repl}" if !rgx
+      # puts "#{@@spaces.keys.inspect} : #{rgx}"
       keys = @@spaces.keys.select{|x|/^#{rgx}/=~x}.sort #_by{|x|x.length}
       (sort==:desc) ? keys.reverse : keys
     end
