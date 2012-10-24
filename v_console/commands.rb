@@ -11,6 +11,7 @@ class VConsole
     end
 
     def _cd
+      @repl = full_path(@repl) if @repl[/\.+/]
       space = grep[0]
       if space
         @@pwd=space
