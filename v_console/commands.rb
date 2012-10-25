@@ -141,6 +141,10 @@ class VConsole
       end
     end
 
+    def _reset
+      @_status = current_space._reset(@repl)
+    end
+
     def _save
       write_spaces
       @_status = 'OK'

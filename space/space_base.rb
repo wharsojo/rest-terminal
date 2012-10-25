@@ -21,6 +21,12 @@ class SpaceBase
     "Inspecting..."
   end
 
+  def _reset(prm)
+    @headers = {}
+    @vars = {}
+    "Remove(no inheritance) Headers & Vars on this space"
+  end
+
   def _vars(prm)
     prm=='' ? show_vars(vars) : set_value(:vars,prm)
   end
@@ -30,11 +36,11 @@ class SpaceBase
     show_send_headers
     show_send_vars
     conn = Faraday.new(:url => @vars[:url])
-    @resp = conn.send(@vars[:conn]) do |req|
-      req.body = @vars[:body] if @vars[:body]
+    @resp = conn.send(vars[:conn]) do |req|
+      req.body = vars[:body] if vars[:body]
       req.headers = headers
     end.env
-    if @headers[:CONTENT_TYPE]=="application/json"
+    if headers[:CONTENT_TYPE]=="application/json"
       puts @resp[:body].pj
     else
       puts @resp[:body]

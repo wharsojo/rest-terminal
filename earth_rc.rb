@@ -44,13 +44,12 @@ module VConsole::Commands # .class_eval <<END
   vars['/stripe/charges/'] = {:timeout=>15, :url=>"https://api.stripe.com/v1/charges", :body=>"amount=400&currency=usd&description=Charge for test@example.com&card=tok_0bEC1DZtDZTK69"}
   vars['/stripe/token/'] = {:timeout=>15, :url=>"https://api.stripe.com/v1/tokens", :body=>"amount=400&currency=usd&description=Charge for testexample.com&card=tok_jOq0M8vJprCUUU"}
   vars['/twitter/'] = {:go=>"language"}
-  vars['/mdk/merchant_new/'] = {:timeout=>15, :conn=>"get", :url=>"http://localhost:3000"}
   #vars_end
   load_persistent(vars,'@vars')
   
   #env_start
-  @@history = ["rm /d", "rm /stripe/token/a/", "help", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "headers wow=kereen", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "rm /twitter/c", "rm /twitter/d", "cd", "create mdk", "cd mdk", "create merchant/new", "set url=http//10.2.250.128080/mdk/rest/merchant/new", "set conn=post", "set url=http://10.2.250.12:8080/mdk/rest/merchant/new", "headers", "send /twitter/", "send /twitter/b", "save", "l", "h", "clear", "info", "send", "rm merchant/new", "ls", "create merchant_new"]
-  @@pwd = "/mdk/"
+  @@history = ["rm /d", "rm /stripe/token/a/", "help", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "headers wow=kereen", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "rm /twitter/c", "rm /twitter/d", "cd", "create mdk", "cd mdk", "create merchant/new", "set url=http//10.2.250.128080/mdk/rest/merchant/new", "set conn=post", "set url=http://10.2.250.12:8080/mdk/rest/merchant/new", "headers", "send /twitter/", "send /twitter/b", "l", "rm merchant/new", "create merchant_new", "clear", "ls", "h", "send", "cd _new", "reset", "info", "save"]
+  @@pwd = "/mdk/merchant_new/"
   #env_end
 
   # @@spaces['/']._set("go=lang")
