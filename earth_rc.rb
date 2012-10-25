@@ -3,7 +3,8 @@ Console.instance_eval <<END
   #space_start
   spaces << '/b/'
   spaces << '/c/d/e/'
-  spaces << '/mdk/merchant/new/'
+  spaces << '/mdk/merchant/'
+  spaces << '/mdk/merchant_new/'
   spaces << '/stripe/charges/'
   spaces << '/stripe/token/'
   spaces << '/twitter/b/c/d/'
@@ -29,7 +30,6 @@ module VConsole::Commands # .class_eval <<END
   headers['/'] = {:CONTENT_TYPE=>"application/x-www-form-urlencoded"}
   headers['/mdk/'] = {:CONTENT_TYPE=>"application/json"}
   headers['/mdk/merchant/'] = {:CONTENT_TYPE=>"application/json"}
-  headers['/mdk/merchant/new/'] = {:CONTENT_TYPE=>"application/json"}
   headers['/stripe/'] = {:CONTENT_TYPE=>"application/x-www-form-urlencoded", :Authorization=>"Basic YzNqdDdmRzYzZ1JkdTVweEJuWXkxMmZUT0RQVkRuQXE6\n"}
   headers['/twitter/'] = {:wow=>"kereen"}
   #headers_end  
@@ -44,11 +44,12 @@ module VConsole::Commands # .class_eval <<END
   vars['/stripe/charges/'] = {:timeout=>15, :url=>"https://api.stripe.com/v1/charges", :body=>"amount=400&currency=usd&description=Charge for test@example.com&card=tok_0bEC1DZtDZTK69"}
   vars['/stripe/token/'] = {:timeout=>15, :url=>"https://api.stripe.com/v1/tokens", :body=>"amount=400&currency=usd&description=Charge for testexample.com&card=tok_jOq0M8vJprCUUU"}
   vars['/twitter/'] = {:go=>"language"}
+  vars['/mdk/merchant_new/'] = {:timeout=>15, :conn=>"get", :url=>"http://localhost:3000"}
   #vars_end
   load_persistent(vars,'@vars')
   
   #env_start
-  @@history = ["rm /d", "rm /stripe/token/a/", "help", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "headers wow=kereen", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "rm /twitter/c", "rm /twitter/d", "cd", "create mdk", "cd mdk", "create merchant/new", "l", "h", "set url=http//10.2.250.128080/mdk/rest/merchant/new", "set conn=post", "set url=http://10.2.250.12:8080/mdk/rest/merchant/new", "send", "ls", "info", "clear", "headers", "save"]
+  @@history = ["rm /d", "rm /stripe/token/a/", "help", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "headers wow=kereen", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "rm /twitter/c", "rm /twitter/d", "cd", "create mdk", "cd mdk", "create merchant/new", "set url=http//10.2.250.128080/mdk/rest/merchant/new", "set conn=post", "set url=http://10.2.250.12:8080/mdk/rest/merchant/new", "headers", "send /twitter/", "send /twitter/b", "save", "l", "h", "clear", "info", "send", "rm merchant/new", "ls", "create merchant_new"]
   @@pwd = "/mdk/"
   #env_end
 

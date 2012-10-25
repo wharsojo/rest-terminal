@@ -1,21 +1,26 @@
+require 'json'
 require 'term/ansicolor'
 include Term::ANSIColor
 
 class String
   include Term::ANSIColor
 
+  def pj
+    JSON.pretty_generate(JSON.parse(self))
+  end
+
   def space_color
-  	x=self.split('/').collect{|x|x.intense_red}.join('/'.red)
-  	"#{x}#{'/'.red}"
+  	c="#{self} ".split(/\//)
+    c[-1].strip!
+  	"#{c.collect{|x|x.intense_red}.join('/'.red)}"
   end
 
   def command_color
     if self.length > 0
       l = self[/^ *\w+ */]
-      c = "#{self[l.length,99]} ".split(/\//).
-      collect{|x|x.intense_red}
+      c = "#{self[l.length,99]} ".split(/\//)
       c[-1].strip!
-      "#{l.green}#{c.join('/'.red)}"
+      "#{l.green}#{c.collect{|x|x.intense_red}.join('/'.red)}"
     else
       self
     end

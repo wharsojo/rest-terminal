@@ -61,7 +61,7 @@ class VConsole
 
     def _history
       @@history.each_with_index do |itm,idx| 
-        puts "#{idx.to_s.rjust(2,'0')} > #{itm.command_color}"
+        puts "#{idx.to_s.rjust(2,'0')} > `#{itm.command_color}`"
       end
       @_status = "#{@@history.length} histories"
     end
@@ -98,7 +98,7 @@ class VConsole
     def _help
       cmd = Commands.instance_methods
       cmd.sort.each_with_index do |itm,idx| 
-        puts "#{idx.to_s.rjust(2,'0')} > #{itm[1,99].intense_cyan}"
+        puts "#{idx.to_s.rjust(2,'0')} > `#{itm[1,99].intense_cyan}`"
       end
       @_status = "#{cmd.length} commands"
     end
@@ -106,7 +106,7 @@ class VConsole
     def _ls
       spaces = grep.each_with_index do |spc,idx|
         colr = "#{spc.space_color}#{'(*)'.red if spc==@@pwd}"
-        colr = "#{idx.to_s.rjust(2,'0')} > #{colr}"
+        colr = "#{idx.to_s.rjust(2,'0')} > `#{colr}`"
         puts colr
       end
       @_status = "List Spaces: #{spaces.length}"

@@ -1,4 +1,3 @@
-require 'json'
 require 'base64'
 require 'faraday'
 require 'shellwords'
@@ -28,13 +27,15 @@ class SpaceBase
 
   def _send(prm)
     puts "send: #{@path}"
+    show_send_headers
+    show_send_vars
     conn = Faraday.new(:url => @vars[:url])
     @resp = conn.send(@vars[:conn]) do |req|
       req.body = @vars[:body] if @vars[:body]
       req.headers = headers
     end.env
     if @headers[:CONTENT_TYPE]=="application/json"
-      puts JSON.pretty_generate(JSON.parse(@resp[:body]))
+      puts @resp[:body].pj
     else
       puts @resp[:body]
     end
@@ -50,6 +51,16 @@ class SpaceBase
   end
 
   private 
+  def show_send_headers
+    show_vars(@headers)
+  end
+
+  def show_send_vars
+    v1 = [:conn,:url,:body]
+    v2 = vars
+    show_vars(Hash[v1.collect{|x|[x,v2[x]]}])
+  end
+
   def inheritances(key,up)
     @_tmp = {}
     @_tmp.merge!(@parent.send(key)) if @parent && up
