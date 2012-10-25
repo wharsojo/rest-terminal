@@ -3,9 +3,18 @@ include Term::ANSIColor
 
 class String
   include Term::ANSIColor
+
   def space_color
   	x=self.split('/').collect{|x|x.intense_red}.join('/'.red)
   	"#{x}#{'/'.red}"
+  end
+
+  def command_color
+    l = self[/^ *\w+ */]
+    c = "#{l.green}#{self[l.length,99]} ".split(/\//).
+    collect{|x|x.intense_red}
+    c[-1] = ''
+    c.join('/'.red)
   end
 end
 

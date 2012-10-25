@@ -61,7 +61,7 @@ class VConsole
 
     def _history
       @@history.each_with_index do |itm,idx| 
-        puts "#{idx.to_s.rjust(2,'0')} > #{itm.intense_cyan}"
+        puts "#{idx.to_s.rjust(2,'0')} > #{itm.command_color}"
       end
       @_status = "#{@@history.length} histories"
     end

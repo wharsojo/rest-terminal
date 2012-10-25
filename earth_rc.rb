@@ -43,7 +43,7 @@ VConsole::Commands.class_eval <<END
   load_persistent(vars,'@vars')
   
   #env_start
-  @@history = ["rm /d", "rm /stripe/token/a/", "help", "clear", "h", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "info", "headers", "headers wow=kereen", "save", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "l", "rm /twitter/c", "ls", "rm /twitter/d"]
+  @@history = ["rm /d", "rm /stripe/token/a/", "help", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "info", "headers", "headers wow=kereen", "save", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "l", "rm /twitter/c", "ls", "clear", "h", "rm /twitter/d"]
   @@pwd = "/twitter/"
   #env_end
 
