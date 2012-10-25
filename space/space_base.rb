@@ -29,11 +29,15 @@ class SpaceBase
   def _send(prm)
     puts "send: #{@path}"
     conn = Faraday.new(:url => @vars[:url])
-    @resp = conn.post do |req|
+    @resp = conn.send(@vars[:conn]) do |req|
       req.body = @vars[:body] if @vars[:body]
       req.headers = headers
     end.env
-    puts @resp[:body]
+    if @headers[:CONTENT_TYPE]=="application/json"
+      puts JSON.pretty_generate(JSON.parse(@resp[:body]))
+    else
+      puts @resp[:body]
+    end
     "#{self.class} Command Send"
   end
 
@@ -79,6 +83,7 @@ class SpaceBase
   def def_vars
     {
       :timeout => 15,
+      :conn => 'get',
       :url => 'http://localhost:3000'
       #:body => standard post params
         # { 
