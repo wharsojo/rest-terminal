@@ -27,7 +27,7 @@ class VConsole
               print ABeol
             end
           else
-            if /[a-zA-Z0-9_\-\/=*.: "\&]/ =~ chr
+            if /[a-zA-Z0-9_\-\/=*.,: "\&\{\}]/ =~ chr
               row = "#{row}#{chr}"
               if chr=='/'
                 print chr.red 

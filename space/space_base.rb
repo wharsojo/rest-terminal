@@ -82,12 +82,15 @@ class SpaceBase
 
   def set_value(key,prm)
     item = instance_variable_get("@#{key}")
-    wrds = Shellwords::shellwords(prm)
-    wrds.each do |itm|
-      v1,v2 = itm.split('=',2).collect{|x|x.strip}
-      item[v1.to_sym] = v2
-    end
-    "#{wrds.length} items"
+    k,v = prm.split('=',2).collect{|x|x.strip}
+    item[k.to_sym] = v
+    "OK"
+    # wrds = Shellwords::shellwords(prm)
+    # wrds.each do |itm|
+    #   v1,v2 = itm.split('=',2).collect{|x|x.strip}
+    #   item[v1.to_sym] = v2
+    # end
+    # "#{wrds.length} items"
   end
 
   def show_vars(items)
