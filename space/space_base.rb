@@ -35,16 +35,22 @@ class SpaceBase
     puts "send: #{@path}"
     show_send_headers
     show_send_vars
-    conn = Faraday.new(:url => @vars[:url])
-    @resp = conn.send(vars[:conn]) do |req|
-      req.body = vars[:body] if vars[:body]
-      req.headers = headers
+
+    varx = vars
+    headerx = headers
+
+    conn = Faraday.new(:url => varx[:url])
+    @resp = conn.send(varx[:conn]) do |req|
+      req.body = varx[:body] if varx[:body]
+      req.headers = headerx
     end.env
-    if headers[:CONTENT_TYPE]=="application/json"
+
+    if headerx[:CONTENT_TYPE]=="application/json"
       puts @resp[:body].pj
     else
       puts @resp[:body]
     end
+
     "#{self.class} Command Send"
   end
 
