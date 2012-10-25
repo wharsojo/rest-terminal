@@ -3,6 +3,7 @@ Console.instance_eval <<END
   #space_start
   spaces << '/b/'
   spaces << '/c/d/e/'
+  spaces << '/mdk/merchant/new/'
   spaces << '/stripe/charges/'
   spaces << '/stripe/token/'
   spaces << '/twitter/b/c/d/'
@@ -28,6 +29,9 @@ VConsole::Commands.class_eval <<END
   headers['/'] = {:CONTENT_TYPE=>"application/x-www-form-urlencoded", :Authorization=>"Basic YzNqdDdmRzYzZ1JkdTVweEJuWXkxMmZUT0RQVkRuQXE6\n"}
   headers['/stripe/'] = {:CONTENT_TYPE=>"application/x-www-form-urlencoded", :Authorization=>"Basic YzNqdDdmRzYzZ1JkdTVweEJuWXkxMmZUT0RQVkRuQXE6\n"}
   headers['/twitter/'] = {:wow=>"kereen"}
+  headers['/mdk/'] = {:CONTENT_TYPE=>"application/json"}
+  headers['/mdk/merchant/'] = {:CONTENT_TYPE=>"application/json"}
+  headers['/mdk/merchant/new/'] = {:CONTENT_TYPE=>"application/json"}
   #headers_end  
   load_persistent(headers,'@headers')
 
@@ -43,8 +47,8 @@ VConsole::Commands.class_eval <<END
   load_persistent(vars,'@vars')
   
   #env_start
-  @@history = ["rm /d", "rm /stripe/token/a/", "help", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "info", "headers", "headers wow=kereen", "save", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "l", "rm /twitter/c", "ls", "clear", "h", "rm /twitter/d"]
-  @@pwd = "/twitter/"
+  @@history = ["rm /d", "rm /stripe/token/a/", "help", "c", "create /a/b/c", "rm /a", "create a/b/c", "rm a/b/c", "rm a", "cd tw", "info", "headers", "headers wow=kereen", "cp /c .", "cp /c/d .", "cp /c/d c", "cp /c/d c/d", "rm /twitter/c", "rm /twitter/d", "cd", "create mdk", "cd mdk", "create merchant/new", "l", "clear", "ls", "h", "save"]
+  @@pwd = "/mdk/"
   #env_end
 
   # @@spaces['/']._set("go=lang")

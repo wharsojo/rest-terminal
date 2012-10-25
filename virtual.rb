@@ -11,10 +11,10 @@ class String
 
   def command_color
     l = self[/^ *\w+ */]
-    c = "#{l.green}#{self[l.length,99]} ".split(/\//).
+    c = "#{self[l.length,99]} ".split(/\//).
     collect{|x|x.intense_red}
-    c[-1] = ''
-    c.join('/'.red)
+    c[-1].strip!
+    "#{l.green}#{c.join('/'.red)}"
   end
 end
 
