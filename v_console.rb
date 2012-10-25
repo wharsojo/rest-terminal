@@ -29,12 +29,12 @@ class VConsole
     print "#{GetC::C_Erase_line}#{prompt}"
     if @skey == GetC::CUp
       @hist -= 1 if @hist > 0
-      @repl = @@history[@hist].to_s.command_color
-      print @repl
+      @repl = @@history[@hist].to_s
+      print @repl.command_color
     elsif @skey == GetC::CDown
       @hist += 1 if @hist < @@history.length
-      @repl = @@history[@hist].to_s.command_color
-      print @repl
+      @repl = @@history[@hist].to_s
+      print @repl.command_color
     end
   end
 
