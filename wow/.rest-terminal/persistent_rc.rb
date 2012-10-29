@@ -1,7 +1,6 @@
 module Rest
-	class Terminal
-
-    module Persistent
+  class Terminal
+    module PersistentRc
       private 
       def load_vars
         spaces = []
@@ -20,9 +19,10 @@ module Rest
         # @repl = ''
 
         #env_start
-        @hist = [:ls, :pwd, :init]
-        @pwd  = "/mdk/"
+        @pwd  = "/stripe/"
         @serv = "localhost"
+        @hist = ["init", "cd", "info", "ls"]
+        @response = {}
         #env_end
       end
     end

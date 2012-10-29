@@ -14,13 +14,13 @@ class ServiceBase
   end
 
   def _info(prm)
-    headerx = headers.select{|k,v|!v.empty?}
-    bodyx = bodies.select{|k,v|!v.empty?}
-    varx = vars.select{|k,v|!v.empty?}
+    headerx = headers.select{|k,v|v && !v.empty?}
+    bodyx = bodies.select{|k,v|v && !v.empty?}
+    varx = vars.select{|k,v|v && !v.empty?}
     line = ('-'*65)
 
     puts ('='*65).yellow
-    puts "[#{varx[:conn]}] #{varx[:url]}".intense_blue
+    # puts "[#{varx[:conn]}] #{varx[:url]}".intense_blue
     puts line.blue
     puts "headers".intense_green 
     puts headerx.pj
@@ -64,9 +64,9 @@ class ServiceBase
 
   def _send(prm)
     #p Rest::Terminal.instance_variable_get("@response")
-    headerx = headers.select{|k,v|!v.empty?}
-    bodyx = bodies.select{|k,v|!v.empty?}
-    varx = vars.select{|k,v|!v.empty?}
+    headerx = headers.select{|k,v|v && !v.empty?}
+    bodyx = bodies.select{|k,v|v && !v.empty?}
+    varx = vars.select{|k,v|v && !v.empty?}
     line = ('-'*65)
 
     puts line.yellow
@@ -142,7 +142,7 @@ class ServiceBase
   end
 
   def body_join
-    bodies.collect do |k,v|
+    bodies.select{|k,v|v && !v.empty?}.collect do |k,v|
       "#{k}=#{v}"
     end.join("&")
   end
