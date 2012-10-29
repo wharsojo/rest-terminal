@@ -1,6 +1,2 @@
 require 'rest'
 Rest::Terminal.run
-# body amount=400 currency=usd "description=Charge for test@example.com" card=tok_0bEC1DZtDZTK69
-# ➜ ./rest set dod = "{ wow : canggih, \
-#                        longont: sayut }"
-# ["set", "dod", "=", "{ wow : canggih, longont: sayut }"]
