@@ -2,11 +2,14 @@ module Rest
   class Terminal
     module PersistentRc
     end
-    
+    module CommandsInfo
+    end
+
     class << self
       include Persistent
       include PersistentRc
       include Commands
+      include CommandsInfo
 
       def initialize
         @skey     = ''
@@ -32,6 +35,16 @@ module Rest
             execute
             save_vars
           end
+        elsif ARGV == [ ]
+          require 'rest/terminal/commands_info'
+          puts ("="*65).yellow
+          commands.sort.each do |x|
+            help_line = "#{x}_line"
+            puts "  #{x.ljust(10)}#{send(help_line)}"
+          end
+          puts ("-"*65).yellow
+          puts "for detail explanation on each command"
+          puts "type: #{'rest help xxx'.green} #xxx: command to know"
         else
           invalid_command
         end
