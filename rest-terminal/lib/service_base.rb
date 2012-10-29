@@ -14,9 +14,9 @@ class ServiceBase
   end
 
   def _info(prm)
-    headerx = headers.select{|k,v|v && !v.empty?}
-    bodyx = bodies.select{|k,v|v && !v.empty?}
-    varx = vars.select{|k,v|v && !v.empty?}
+    headerx = headers
+    bodyx = bodies
+    varx = vars
     line = ('-'*65)
 
     puts ('='*65).yellow
@@ -64,9 +64,9 @@ class ServiceBase
 
   def _send(prm)
     #p Rest::Terminal.instance_variable_get("@response")
-    headerx = headers.select{|k,v|v && !v.empty?}
-    bodyx = bodies.select{|k,v|v && !v.empty?}
-    varx = vars.select{|k,v|v && !v.empty?}
+    headerx = headers
+    bodyx = bodies
+    varx = vars
     line = ('-'*65)
 
     puts line.yellow
@@ -103,15 +103,23 @@ class ServiceBase
   end
 
   def headers(up=true)
-    inheritances(:headers,up)
+    inheritances(:headers,up).select{|k,v|v && !v.empty?}
   end
 
   def bodies(up=true)
-    inheritances(:bodies,up)
+    inheritances(:bodies,up).select{|k,v|v && !v.empty?}
   end
 
   def vars(up=true)
-    inheritances(:vars,up)
+    inheritances(:vars,up).select{|k,v|v && !v.empty?}
+  end
+
+  def inheritances(key,up)
+    @_tmp = {}
+    @_tmp.merge!(@parent.send(:inheritances,key,up)) if @parent && up
+    @_tmp = @_tmp.merge(instance_variable_get("@#{key}"))
+    # p "p: #{@path} - #{@vars} #{@parent.class} >> i: #{@_tmp}"
+    @_tmp
   end
 
   private 
@@ -142,17 +150,9 @@ class ServiceBase
   end
 
   def body_join
-    bodies.select{|k,v|v && !v.empty?}.collect do |k,v|
+    bodies.collect do |k,v|
       "#{k}=#{v}"
     end.join("&")
-  end
-
-  def inheritances(key,up)
-    @_tmp = {}
-    @_tmp.merge!(@parent.send(key)) if @parent && up
-    @_tmp = @_tmp.merge(instance_variable_get("@#{key}"))
-    # p "p: #{@path} - #{@vars} #{@parent.class} >> i: #{@_tmp}"
-    @_tmp
   end
 
   def set_value(key,prm)
