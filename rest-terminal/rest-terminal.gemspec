@@ -17,7 +17,8 @@ Gem::Specification.new do |s|
 
 	s.require_paths = ["lib"] 
     s.executables   = ["rest","rt"]
-	s.add_runtime_dependency "term-ansicolor"
-	s.add_runtime_dependency "faraday"
-	s.add_runtime_dependency "rake"
+	s.add_runtime_dependency "json", '~>1.7.5'
+	s.add_runtime_dependency "term-ansicolor", '~>1.0.7'
+	s.add_runtime_dependency "faraday", '~>0.8.4'
+	s.post_install_message = ">>In your console, type 'rest' or 'rt' to run this program<<"
 end

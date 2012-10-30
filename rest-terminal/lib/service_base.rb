@@ -7,7 +7,7 @@ class ServiceBase
     @path     = path
     @response = {}
     @parent   = vc 
-    reset
+    reset(%w(headers body vars))
     if File.exists?("services#{path}service.rb")
       instance_eval(IO.read("services#{path}service.rb"))
     end
@@ -34,15 +34,15 @@ class ServiceBase
   end
 
   def _headers(prm)
-    prm==[] ? show_vars(headers) : set_value(:headers,prm)
+    prm==[] ? show_vars(headers,'headers') : set_value(:headers,prm)
   end
 
   def _body(prm)
-    prm==[] ? show_vars(bodies) : set_value(:bodies,prm)
+    prm==[] ? show_vars(bodies,'body') : set_value(:bodies,prm)
   end
 
   def _vars(prm)
-    prm==[] ? show_vars(vars) : set_value(:vars,prm)
+    prm==[] ? show_vars(vars,'vars') : set_value(:vars,prm)
   end
 
   def _response(prm)
@@ -51,15 +51,11 @@ class ServiceBase
   end
 
   def _reset(prm)
-    @headers = {}
-    @bodies = {}
-    @vars = {}
+    reset(prm)
+    show_vars(headers,'headers')
+    show_vars(bodies,'bodies')
+    show_vars(vars,'vars')
     save_vars
-    "Reset data"
-  end
-
-  def _reset_vars(prm)
-    prm==[] ? show_vars(vars) : reset_value(:vars,prm)
   end
 
   def _send(prm)
@@ -93,7 +89,7 @@ class ServiceBase
       Rest::Terminal.instance_variable_set("@response",@response)
       puts line.red
       puts "response".intense_green 
-      puts @response.pj #[:response_headers].inspect
+      puts @response #.pj #[:response_headers].inspect
       save_vars
       ""
     rescue Faraday::Error::ConnectionFailed => e
@@ -116,37 +112,46 @@ class ServiceBase
 
   def inheritances(key,up)
     @_tmp = {}
-    @_tmp.merge!(@parent.send(:inheritances,key,up)) if @parent && up
-    @_tmp = @_tmp.merge(instance_variable_get("@#{key}"))
-    # p "p: #{@path} - #{@vars} #{@parent.class} >> i: #{@_tmp}"
+    if @parent && up
+      v_par = @parent.send(:inheritances,key,up)
+      @_tmp.merge!(v_par) if v_par
+    end
+    v_ins = instance_variable_get("@#{key}")
+    @_tmp = @_tmp.merge(v_ins) if v_ins
     @_tmp
   end
 
-  private 
-  def reset
-    if @parent
-      @headers = {}
-      @bodies  = {}
-      @vars    = {}
-    else
-      @headers = def_headers
-      @bodies  = def_bodies
-      @vars    = def_vars
+  private
+  # ex: rest reset body
+  # reset value to def_value or empty/[]  
+  def reset(prm)
+    params = prm - (prm - %w(headers body vars))
+    params.each do |x|
+      @headers = (@parent ? {} : def_headers) if x=='headers'
+      @bodies  = (@parent ? {} : def_bodies) if x=='body'
+      @vars    = (@parent ? {} : def_vars) if x=='vars'
     end
   end
 
   def show_send_headers
-    show_vars(@headers)
+    show_vars(headers,'headers')
   end
 
   def show_send_bodies
-    show_vars(@bodies)
+    show_vars(bodies,'body')
   end
 
   def show_send_vars
     v1 = [:conn,:url,:body]
     v2 = vars
-    show_vars(Hash[v1.collect{|x|[x,v2[x]]}])
+    show_vars(Hash[v1.collect{|x|[x,v2[x]]}],'vars')
+  end
+
+  def show_vars(items,key)
+    line = ('-'*65)
+    puts line.blue
+    puts key.intense_green 
+    puts items.pj
   end
 
   def body_join
@@ -178,15 +183,9 @@ class ServiceBase
         end
       end
     end
+    show_vars(item,key)
     save_vars
     "OK"
-  end
-
-  def show_vars(items)
-    items.each do |v|
-      puts "#{v[0]} = #{v[1]}"
-    end
-    "#{items.length} items".green
   end
 
   def def_headers

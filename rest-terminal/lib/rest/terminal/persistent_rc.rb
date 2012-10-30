@@ -5,9 +5,7 @@ module Rest
       def load_vars
         spaces = []
         #space_start
-        spaces << '/stripe/charges/'
-        spaces << '/stripe/token/'
-        spaces << '/twitter/'
+        spaces << '/google/search/'
         #space_end
         # ::Rest::Terminal.instance_variable_set("@serv",spaces)
         @spaces = spaces
@@ -18,7 +16,7 @@ module Rest
 
         #env_start
         @hist = [ ]
-        @pwd  = "/"
+        @pwd  = "/google/"
         @serv = "localhost"
         #env_end
       end

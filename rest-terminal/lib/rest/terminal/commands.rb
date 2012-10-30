@@ -14,7 +14,7 @@ module Rest
 
       def _init
         require 'fileutils'
-        pth = File.dirname(__FILE__)
+        pth = "#{File.dirname(__FILE__)}/.."
         FileUtils.mkdir_p ".rest-terminal"
         `cp #{pth}/terminal/persistent_rc.rb .rest-terminal`
         require './.rest-terminal/persistent_rc'
@@ -53,6 +53,16 @@ module Rest
           fp = "Service not exists! #{fp}".red
         end
         @_status = fp
+      end
+
+      def _help
+        require 'rest/terminal/commands_info'
+        params = @prm - (@prm - commands)
+        params.sort.each do |x|
+          puts ("-"*65)
+          puts x.green
+          puts send("#{x}_help")
+        end
       end
 
       def _history

@@ -10,8 +10,8 @@ module Rest
           p2 = "#{p2}#{path}/"
           pr = @services[p1]
           @services[p2] = ServiceBase.new(pr,p2)
-          p "PARRENT: #{pr} - #{p1} - #{p2}"
-          p @services[p2].vars
+          # p "PARRENT: #{pr} - #{p1} - #{p2}"
+          # p @services[p2].vars
         end
         pr = @services[@pwd]
         path = Dir["#{current_path}*/"]

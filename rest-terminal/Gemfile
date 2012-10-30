@@ -8,7 +8,6 @@ group :test do
   gem 'turn', :require => false
 end
 
-gem "json"
-gem "term-ansicolor"
-gem "faraday"
-gem "rake"
+gem "json", '~>1.7.5'
+gem "term-ansicolor", '~>1.0.7'
+gem "faraday", '~>0.8.4'
